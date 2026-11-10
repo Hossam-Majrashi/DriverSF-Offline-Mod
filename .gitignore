@@ -1,0 +1,82 @@
+# Local runtime files, saves, private settings and installation records
+/logs/
+/backups/
+/settings.ini
+/installed-*.txt
+/installed-*.sha256
+# Build intermediates: retain only the CURRENT distributable and checksum
+/build/*
+!/build/dinput8.dll
+!/build/SHA256SUMS
+__pycache__/
+*.py[cod]
+*.o
+*.obj
+*.pdb
+*.lib
+*.tmp
+.DS_Store
+Thumbs.db
+# Research/history/game data never belong in this repository
+/evidence/
+/research/
+/profanity/
+/releases/
+/Driver.exe
+/Locale/
+/media/
+/Resources/
+*.astd
+*.pck
+*.fchunk
+*.sp
+*.dngc
+# Visual asset filter: publish authored tools and selection metadata only.
+# These local outputs contain game-derived bytes, private paths/state or previews.
+/asset_filter/payloads/
+/asset_filter/prepared/
+/asset_filter/video_private/
+/asset_filter/replacement_previews/
+/asset_filter/additional_reviewed_images.jpg
+/asset_filter/replacements.html
+/asset_filter/plan.json
+/asset_filter/state.json
+/asset_filter/*verification.json
+/asset_filter/independent_validation.json
+/asset_filter/executables_before.sha256
+/asset_filter/*.log
+/asset_filter/.lock
+/asset_filter/*.tmp
+
+# Audio filter: device-specific plans/media/history are NEVER public inputs.
+/audio_filter/prepared/
+/audio_filter/refinement/
+/audio_filter/library_ui_before/
+/audio_filter/*.json
+/audio_filter/*.csv
+/audio_filter/*.sha256
+/audio_filter/*.png
+/audio_filter/*.jpg
+/audio_filter/.lock
+/audio_filter/extend_prepared.py
+/audio_filter/refine_effects.py
+/audio_filter/final_audit.py
+# Disposable diagnostics from any component
+*.log
+*.tmp
+*.bak
+/CONTROL_REVIEW.md
+# Do not accidentally add extracted or derived game resources.
+*.bik
+*.wem
+*.wav
+*.ogg
+*.mp3
+*.flac
+*.grbk
+*.dds
+*.bin
+# Export/archive destinations are not source files.
+/DSF_Mod_GitHub/
+/DSF_Mod_Local_Archive/
+*.zip

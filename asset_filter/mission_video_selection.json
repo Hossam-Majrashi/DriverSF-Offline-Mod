@@ -1,0 +1,26 @@
+{
+  "description": "Supplement to the archive filter: replace visually reviewed female mission-preview and picture-in-picture portraits with two existing male game characters. Whole video frames are reused; original per-language audio packets, frame count, timing and alpha settings are preserved. This does not replace live 3D character models or cinematic scenes.",
+  "donor": "Common/fmv/previews/uid00000_mpr01.bik",
+  "reviewed_mission_uids": ["00244", "00282", "00334", "00408", "00720", "00773", "00846", "01234", "02295", "02330", "02807", "02821", "03354", "03792", "03866", "04852", "05966"],
+  "extra_pip_files": [
+    "Common/fmv/pips/uid00000_PIP04.bik",
+    "Common/fmv/pips/uid01271_Pip03.bik",
+    "Common/fmv/pips/uid01780_pip02.bik",
+    "Common/fmv/pips/uid03330_pip01.bik",
+    "Common/fmv/pips/uid12496_pip01.bik",
+    "Common/fmv/pips/uid12496_pip02.bik",
+    "Common/fmv/pips/uid15056_pip02.bik"
+  ],
+  "evidence": {
+    "screenshot": "Screenshot_20261107_235013.png",
+    "matching_source": "Common/fmv/previews/uid00334_MPR01.bik",
+    "mission": "Racing Hearts",
+    "basis": "Visual comparison with locally decoded BIK frames, not a claim of gameplay testing"
+  },
+  "limitations": [
+    "Both portrait slots in selected clips use the male donor, not just the female slot.",
+    "Original dialogue remains, including female voices; lip motion may not match it.",
+    "Full-screen cinematics and live 3D character substitution are not implemented here.",
+    "Only the explicit reviewed video scope is covered; no claim that every female depiction in the game has been found."
+  ]
+}
