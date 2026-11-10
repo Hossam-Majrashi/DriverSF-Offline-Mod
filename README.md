@@ -10,11 +10,8 @@
 ## لقطات من اللعبة / Gameplay Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/driver_sf_gameplay1.jpg" alt="Driver San Francisco Gameplay 1" width="48%">
-  <img src="assets/screenshots/driver_sf_gameplay2.jpg" alt="Driver San Francisco Gameplay 2" width="48%">
-</p>
-<p align="center">
-  <img src="assets/screenshots/driver_sf_gameplay3.jpg" alt="Driver San Francisco Gameplay 3" width="70%">
+  <img src="assets/screenshots/driver_sf_gameplay1.jpg" alt="Driver San Francisco Gameplay 1" width="49%">
+  <img src="assets/screenshots/driver_sf_gameplay2.jpg" alt="Driver San Francisco Gameplay 2" width="49%">
 </p>
 
 ## المزايا والنطاق
