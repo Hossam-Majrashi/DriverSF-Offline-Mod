@@ -3,7 +3,7 @@ set -euo pipefail
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 game="$(dirname -- "$here")"
 command -v python3 >/dev/null || { echo 'Python 3 is required.' >&2; exit 1; }
-# Existing prefix only. Never silently create a different prefix or select GE.
+# Prefix path: existing prefix or auto-initialized on first run.
 export WINEPREFIX="${DSF_WINEPREFIX:-$HOME/Games/driver-san-francisco}"
 if [[ -n "${DSF_PROTONPATH:-}" ]]; then
   export PROTONPATH="$DSF_PROTONPATH"
@@ -16,8 +16,23 @@ if [[ -z "$umu" ]]; then
   umu="$(command -v umu-run || true)"
   [[ -n "$umu" ]] || umu="$HOME/.local/share/lutris/runtime/umu/umu-run"
 fi
-[[ -f "$WINEPREFIX/system.reg" && -d "$WINEPREFIX/drive_c" ]] || { echo "Missing existing prefix: $WINEPREFIX" >&2; exit 1; }
 [[ -x "$PROTONPATH/files/bin/wine" && -f "$PROTONPATH/proton" ]] || { echo "Missing selected Proton runner: $PROTONPATH" >&2; exit 1; }
+if [[ ! -f "$WINEPREFIX/system.reg" || ! -d "$WINEPREFIX/drive_c" ]]; then
+  echo "Initializing prefix: $WINEPREFIX" >&2
+  mkdir -p "$WINEPREFIX"
+  if [[ -n "$umu" && -f "$umu" ]]; then
+    WINEPREFIX="$WINEPREFIX" PROTONPATH="$PROTONPATH" GAMEID=umu-default STORE=ubisoft UMU_RUNTIME_UPDATE=0 \
+      python3 "$umu" createprefix >/dev/null 2>&1 || true
+  fi
+  if [[ ! -f "$WINEPREFIX/system.reg" || ! -d "$WINEPREFIX/drive_c" ]] && [[ -f "$PROTONPATH/proton" ]]; then
+    STEAM_COMPAT_DATA_PATH="$WINEPREFIX" STEAM_COMPAT_CLIENT_INSTALL_PATH="${STEAM_COMPAT_CLIENT_INSTALL_PATH:-$HOME/.steam/steam}" \
+      "$PROTONPATH/proton" run wineboot -u >/dev/null 2>&1 || true
+    if [[ -d "$WINEPREFIX/pfx" && ! -f "$WINEPREFIX/system.reg" ]]; then
+      cp -rn "$WINEPREFIX/pfx/"* "$WINEPREFIX/" 2>/dev/null || true
+    fi
+  fi
+fi
+[[ -f "$WINEPREFIX/system.reg" && -d "$WINEPREFIX/drive_c" ]] || { echo "Missing existing prefix: $WINEPREFIX" >&2; exit 1; }
 [[ -f "$umu" ]] || { echo "Missing UMU runtime: $umu (set DSF_UMU)." >&2; exit 1; }
 # Prefer mapped SDL/XInput for this DS4 only; no global remap/registry changes.
 ds4Mode="${DSF_DS4_XINPUT:-1}"

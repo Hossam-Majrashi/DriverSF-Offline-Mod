@@ -30,7 +30,7 @@ FILTER_FILES = (
     'audio_filter/README_AR.md',
 )
 SOURCE_DIRS = ('src', 'vendor', 'assets', 'ui', 'tools')
-SOURCE_SUFFIXES = {'.py', '.c', '.cpp', '.h', '.s', '.def', '.lua', '.md', '.txt', '.ttf', '.json', '.sh', '.jpg', '.png'}
+SOURCE_SUFFIXES = {'.py', '.c', '.cpp', '.h', '.s', '.def', '.lua', '.md', '.txt', '.ttf', '.json', '.sh', '.jpg', '.png', '.mp4'}
 PRIVATE_PARTS = {'backups', 'logs', 'prepared', 'payloads', 'video_private',
                  'refinement', 'library_ui_before', '__pycache__'}
 GAME_SUFFIXES = {'.exe', '.pck', '.sp', '.fchunk', '.dngc', '.astd', '.bik',
@@ -68,7 +68,7 @@ def selected_files(root):
         need(path.is_file() and not path.is_symlink(), 'Missing/linked release file: ' + relative)
         need(not any(part in PRIVATE_PARTS for part in Path(relative).parts), 'Private release path: ' + relative)
         need(path.suffix.lower() not in GAME_SUFFIXES, 'Game asset refused: ' + relative)
-        need(path.stat().st_size < 50 * 1024 * 1024, 'Unexpected oversized release file: ' + relative)
+        need(path.stat().st_size <= 100 * 1024 * 1024, 'Unexpected oversized release file: ' + relative)
     return sorted(selected)
 
 

@@ -22,7 +22,7 @@
   "driver_exe_sha256": "c79987b0548f7130337c3f295c8fe269e120ceddad55c1159e6f5cbc6aa26616",
   "ui_default": "Arabic",
   "ui_optional": "English",
-  "linux_default": "Proton Experimental via UMU; existing prefix required",
+  "linux_default": "Proton Experimental via UMU; auto-initializes prefix if needed",
   "controller_compatibility": "DS4 054c:05c4 SDL/XInput request; ordinal-2 F1 suppression and verified native slot-0 hotplug enumeration delegation; input/rumble acceptance pending",
   "controller_hotplug_gameplay_verified": false,
   "lua_embedding": "authored Lua 5.1 bytecode; little-endian float32 numbers / size_t32; no private game prototypes embedded; protected error phase/text diagnostics",

@@ -74,12 +74,16 @@ Driver San Francisco/
 
 ### Linux
 
-المتطلبات: Bash وPython 3 وUMU وProton Experimental مثبت من Steam، وWine prefix
-موجود مسبقًا تعمل فيه اللعبة. لا ينشئ المشغّل prefix جديدًا ولا يختار GE تلقائيًا.
+المتطلبات: Bash وPython 3 وProton Experimental مثبت من Steam (وUMU إن توفر).
+يقوم المشغّل تلقائيًا بإنشاء وتهيئة الـprefix في مسار `~/Games/driver-san-francisco` إذا لم يكن موجودًا مسبقًا دون الحاجة لإعداد يدوي.
 
 من مجلد اللعبة:
 
 ```bash
+# تثبيت ملف المود وتهيئة البيئة:
+./mod/install.sh
+
+# فحص البيئة أو تشغيل اللعبة دون لانشر:
 ./mod/launch.sh --check
 ./mod/launch.sh
 ```

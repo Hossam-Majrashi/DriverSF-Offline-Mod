@@ -37,3 +37,35 @@ else
 fi
 sha256sum "$game/dinput8.dll" > "$here/installed-dll.sha256"
 printf 'Installed standalone proxy: %s\n' "$game/dinput8.dll"
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  prefix="${DSF_WINEPREFIX:-$HOME/Games/driver-san-francisco}"
+  if [[ ! -f "$prefix/system.reg" || ! -d "$prefix/drive_c" ]]; then
+    printf 'Initializing compatibility prefix at: %s\n' "$prefix"
+    if command -v python3 >/dev/null && [[ -f "$here/tools/find_proton.py" ]]; then
+      runner="$(python3 "$here/tools/find_proton.py" "$game" 2>/dev/null || true)"
+      if [[ -n "$runner" ]]; then
+        umu="${DSF_UMU:-}"
+        if [[ -z "$umu" ]]; then
+          umu="$(command -v umu-run || true)"
+          [[ -n "$umu" ]] || umu="$HOME/.local/share/lutris/runtime/umu/umu-run"
+        fi
+        mkdir -p "$prefix"
+        if [[ -n "$umu" && -f "$umu" ]]; then
+          WINEPREFIX="$prefix" PROTONPATH="$runner" GAMEID=umu-default STORE=ubisoft UMU_RUNTIME_UPDATE=0 \
+            python3 "$umu" createprefix >/dev/null 2>&1 || true
+        fi
+        if [[ ! -f "$prefix/system.reg" || ! -d "$prefix/drive_c" ]] && [[ -f "$runner/proton" ]]; then
+          STEAM_COMPAT_DATA_PATH="$prefix" STEAM_COMPAT_CLIENT_INSTALL_PATH="${STEAM_COMPAT_CLIENT_INSTALL_PATH:-$HOME/.steam/steam}" \
+            "$runner/proton" run wineboot -u >/dev/null 2>&1 || true
+          if [[ -d "$prefix/pfx" && ! -f "$prefix/system.reg" ]]; then
+            cp -rn "$prefix/pfx/"* "$prefix/" 2>/dev/null || true
+          fi
+        fi
+      fi
+    fi
+  fi
+  if [[ -f "$prefix/system.reg" && -d "$prefix/drive_c" ]]; then
+    printf 'Compatibility prefix ready: %s\n' "$prefix"
+  fi
+fi
