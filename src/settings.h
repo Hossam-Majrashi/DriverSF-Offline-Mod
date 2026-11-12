@@ -1,10 +1,10 @@
 // Safe preferences/bindings only; active lamps/gameplay switches are not saved.
+#include "complete_hook.h"
 static const WCHAR*signalKeyNames[]={L"LeftKey",L"RightKey",L"HazardKey"};
 static const WCHAR*signalPadNames[]={L"LeftPad",L"RightPad",L"HazardPad"};
 static WCHAR settingsPath[MAX_PATH];
 static int menuScalePercent=125;
 static char settingsStatus[160]="Preferences loaded.";
-static void (*onCompleteGame100)() = nullptr;
 static int clampSetting(int value,int low,int high,int fallback) {
     return value>=low && value<=high?value:fallback;
 }

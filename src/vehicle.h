@@ -1,6 +1,7 @@
 // Internal, single-player vehicle hooks for the hash-gated executable only.
 // Player-only native hooks; native register/stack contracts must be retained.
 #include "vehicle_policy.h"
+#include "complete_hook.h"
 namespace VehicleMod {
 static std::atomic<bool> health{false}, nitro{false}, body{false}, speed{false};
 static std::atomic<bool> ram{false}, oneHit{false};
@@ -297,7 +298,8 @@ static void draw() {
     if(Ui::CollapsingHeader("Game Completion [100%]",ImGuiTreeNodeFlags_DefaultOpen)) {
         static bool complete100Notified=false;
         if(Ui::Button("Complete Game [100%]: All Missions, Dares & Tokens",ImVec2(-1,0))) {
-            NitroLua::World::queueCompleteGame100();
+            if(onCompleteGame100) onCompleteGame100();
+            else NitroLua::World::queueCompleteGame100();
             complete100Notified=true;
         }
         if(complete100Notified) {

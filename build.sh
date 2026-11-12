@@ -22,7 +22,7 @@ zig c++ -target x86-windows-gnu -std=c++17 -O2 -DNDEBUG -shared \
   vendor/imgui/imgui_tables.cpp vendor/imgui/imgui_widgets.cpp \
   vendor/imgui/backends/imgui_impl_win32.cpp vendor/imgui/backends/imgui_impl_dx9.cpp \
   "$tmp/buffer.o" "$tmp/hook.o" "$tmp/trampoline.o" "$tmp/hde_hde32.o" "$tmp/nitro_bridge.o" "$tmp/speed_bridge.o" \
-  src/dinput8.def -ld3d9 -lxinput1_3 -ldwmapi -lgdi32 -limm32 -ladvapi32 -luuid -o "$tmp/dinput8.dll"
+  src/dinput8.def -ld3d9 -lxinput1_3 -ldwmapi -lgdi32 -limm32 -ladvapi32 -lshell32 -luuid -o "$tmp/dinput8.dll"
 cp -- "$tmp/dinput8.dll" "$out/dinput8.dll"
 (cd -- "$out"; sha256sum dinput8.dll > SHA256SUMS)
 file "$out/dinput8.dll"

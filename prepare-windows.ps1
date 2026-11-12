@@ -25,6 +25,16 @@ $graphicsContent = "Fullscreen = 1`r`nVSync = 1`r`nPreciseVSync = 0`r`nWidth = 1
 if (!(Test-Path -LiteralPath $graphicsIni) -or (Get-Content -LiteralPath $graphicsIni | Select-String 'RenderQuality = 0')) {
     [IO.File]::WriteAllText($graphicsIni, $graphicsContent)
 }
+$autosave100 = Join-Path $mod 'assets\autosave100.dat'
+if (Test-Path -LiteralPath $autosave100) {
+    foreach ($sub in @('Player\savegames\autosave.dat', 'savegames\autosave.dat')) {
+        $p = Join-Path $save $sub
+        if (!(Test-Path -LiteralPath $p)) {
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $p) | Out-Null
+            Copy-Item -LiteralPath $autosave100 -Destination $p
+        }
+    }
+}
 if ($backupMode -eq '1') {
 $backup = Join-Path $mod ('backups\windows-' + (Get-Date -Format 'yyyyMMdd-HHmmss-ffff'))
 New-Item -ItemType Directory -Path $backup | Out-Null

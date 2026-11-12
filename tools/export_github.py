@@ -30,7 +30,7 @@ FILTER_FILES = (
     'audio_filter/README_AR.md',
 )
 SOURCE_DIRS = ('src', 'vendor', 'assets', 'ui', 'tools')
-SOURCE_SUFFIXES = {'.py', '.c', '.cpp', '.h', '.s', '.def', '.lua', '.md', '.txt', '.ttf', '.json', '.sh', '.jpg', '.png', '.mp4', '.ini'}
+SOURCE_SUFFIXES = {'.py', '.c', '.cpp', '.h', '.s', '.def', '.lua', '.md', '.txt', '.ttf', '.json', '.sh', '.jpg', '.png', '.mp4', '.ini', '.dat'}
 PRIVATE_PARTS = {'backups', 'logs', 'prepared', 'payloads', 'video_private',
                  'refinement', 'library_ui_before', '__pycache__'}
 GAME_SUFFIXES = {'.exe', '.pck', '.sp', '.fchunk', '.dngc', '.astd', '.bik',

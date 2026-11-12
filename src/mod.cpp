@@ -142,12 +142,28 @@ static void bindMoney() {
     bound=true;
     char b[200];snprintf(b,sizeof(b),"bound by registration: callback RVA=%lx setter RVA=%lx singleton RVA=%lx",(unsigned long)(callback-image),(unsigned long)(target-image),(unsigned long)((BYTE*)singletonSlot-image));logLine(b);
 }
+#include "complete_game.h"
 #include "vehicle.h"
 #include "paint.h"
 #include "speed.h"
 #include "powertrain.h"
 #include "controller.h"
 #include "signal_controls.h"
+static void execute100PercentCompletion() {
+    logLine("execute100PercentCompletion: writing 100% save data...");
+    bool wrote = CompleteGame::executeSavegameWrite();
+    char b[180];
+    snprintf(b, sizeof(b), "Complete Game 100%%: save file write %s", wrote ? "SUCCEEDED" : "FAILED");
+    logLine(b);
+
+    int *p = profile();
+    if (p) {
+        safeApply(p, 10000000);
+        logLine("Complete Game 100%: wallet willpower set to 10,000,000");
+    }
+
+    VehicleMod::NitroLua::World::queueCompleteGame100();
+}
 static bool parseAmount(const char *s,int &v) {
     if(!*s)return false;int64_t n=0;
     for(;*s;s++){if(*s<'0'||*s>'9')return false;n=n*10+(*s-'0');if(n>POLICY_MAX)return false;}v=(int)n;return true;
@@ -325,7 +341,7 @@ static void drawMenu(IDirect3DDevice9 *device) {
     if(!uiReady) {
         D3DDEVICE_CREATION_PARAMETERS cp{};device->GetCreationParameters(&cp);windowHandle=cp.hFocusWindow;
         ImGui::CreateContext();auto &io=ImGui::GetIO();io.IniFilename=nullptr;io.LogFilename=nullptr;
-        onCompleteGame100 = VehicleMod::NitroLua::World::queueCompleteGame100;
+        onCompleteGame100 = execute100PercentCompletion;
         loadSettings();Ui::initFont();
         io.ConfigFlags|=ImGuiConfigFlags_NavEnableKeyboard;io.FontGlobalScale=menuScalePercent/100.0f;
         ImGui::StyleColorsDark();ImGui_ImplWin32_Init(windowHandle);ImGui_ImplDX9_Init(device);

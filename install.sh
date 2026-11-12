@@ -85,6 +85,14 @@ if [[ "$(uname -s)" == "Linux" ]]; then
             if [[ ! -f "$doc/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
               printf '%s' "$graphicsCfg" > "$doc/Ubisoft/Driver San Francisco/graphics.ini"
             fi
+            if [[ -f "$here/assets/autosave100.dat" ]]; then
+              for target in "$doc/Ubisoft/Driver San Francisco/Player/savegames/autosave.dat" "$doc/Ubisoft/Driver San Francisco/savegames/autosave.dat"; do
+                if [[ ! -f "$target" ]]; then
+                  mkdir -p "$(dirname -- "$target")"
+                  cp -n "$here/assets/autosave100.dat" "$target"
+                fi
+              done
+            fi
           fi
         done
       fi

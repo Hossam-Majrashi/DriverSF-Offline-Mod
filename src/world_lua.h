@@ -214,7 +214,7 @@ static void sync(State*L) {
         const char *code =
             "if ProfileSettings then "
             "  if type(ProfileSettings.SetStoryModeComplete)=='function' then pcall(ProfileSettings.SetStoryModeComplete,true) end "
-            "  if type(ProfileSettings.SetChapter)=='function' then pcall(ProfileSettings.SetChapter,9) end "
+            "  if type(ProfileSettings.SetChapter)=='function' then pcall(ProfileSettings.SetChapter,8) end "
             "  if type(ProfileSettings.SetProgression)=='function' and type(challengeProgressionTable)=='table' then pcall(ProfileSettings.SetProgression,#challengeProgressionTable) end "
             "  if type(ProfileSettings.SetWillpower)=='function' then pcall(ProfileSettings.SetWillpower,10000000) end "
             "  if type(ProfileSettings.SetUserControlledShiftUnlocked)=='function' then pcall(ProfileSettings.SetUserControlledShiftUnlocked,true) end "
@@ -223,6 +223,7 @@ static void sync(State*L) {
             "if type(progressionSystem)=='table' then "
             "  progressionSystem.isEverythingUnlocked=true "
             "  progressionSystem.currentChapter=8 "
+            "  if type(progressionSystem.updateUnlockProgression)=='function' then pcall(progressionSystem.updateUnlockProgression) end "
             "end "
             "if type(challengeProgressionTable)=='table' and ProfileSettings then "
             "  for _,pot in ipairs(challengeProgressionTable) do "
@@ -389,8 +390,21 @@ static void sync(State*L) {
             "if type(enableCityLocking)=='function' then pcall(enableCityLocking,false) end "
             "if ProfileSettings and type(ProfileSettings.TriggerAutoSave)=='function' then pcall(ProfileSettings.TriggerAutoSave) end "
             "if type(progressionSystem)=='table' and type(progressionSystem.saveGame)=='function' then pcall(progressionSystem.saveGame,'When you complete the game') end";
-        if(api.loadBuffer(L,code,strlen(code),"@mod/complete_game_100.lua")==0)api.pcall(L,0,0,0);
-        logLine("Game completed 100%: missions, dares, tokens, garages and cars applied and autosaved");
+        int status=api.loadBuffer(L,code,strlen(code),"@mod/complete_game_100.lua");
+        if(status!=0) {
+            const char* msg=api.toString?api.toString(L,-1,nullptr):"unknown syntax error";
+            char b[256];snprintf(b,sizeof(b),"completeGame100 loadBuffer error %d: %s",status,msg);
+            logLine(b);
+        } else {
+            status=api.pcall(L,0,0,0);
+            if(status!=0) {
+                const char* msg=api.toString?api.toString(L,-1,nullptr):"unknown runtime error";
+                char b[256];snprintf(b,sizeof(b),"completeGame100 pcall error %d: %s",status,msg);
+                logLine(b);
+            } else {
+                logLine("Game completed 100%: missions, dares, tokens, garages and cars applied and autosaved");
+            }
+        }
     }
     if(spawnRequested.exchange(false)) {
         int id=pendingSpawnModelID.exchange(0);
