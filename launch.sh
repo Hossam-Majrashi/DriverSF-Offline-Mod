@@ -34,10 +34,14 @@ if [[ ! -f "$WINEPREFIX/system.reg" || ! -d "$WINEPREFIX/drive_c" ]]; then
 fi
 [[ -f "$WINEPREFIX/system.reg" && -d "$WINEPREFIX/drive_c" ]] || { echo "Missing existing prefix: $WINEPREFIX" >&2; exit 1; }
 [[ -f "$umu" ]] || { echo "Missing UMU runtime: $umu (set DSF_UMU)." >&2; exit 1; }
-# Ensure offline profile configuration exists so the game never prompts for online login
+# Ensure offline profile and optimal graphics settings exist so the game never prompts for online login or resets to low quality
 offlineCfg='OnlineUserName Player'$'\n''OnlineID 1'$'\n'
+graphicsCfg='Fullscreen = 1'$'\n''VSync = 1'$'\n''PreciseVSync = 0'$'\n''Width = 1920'$'\n''Height = 1080'$'\n''RenderQuality = 2'$'\n''AntiAliasing = 2'$'\n''RadialBlur = 1'$'\n'
 mkdir -p "$HOME/Documents/Ubisoft/Driver San Francisco"
 [[ -f "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini"
+if [[ ! -f "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+  printf '%s' "$graphicsCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini"
+fi
 if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
   for u in "$WINEPREFIX/drive_c/users/"*; do
     if [[ -d "$u" ]]; then
@@ -45,6 +49,9 @@ if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
         if [[ -d "$doc" ]]; then
           mkdir -p "$doc/Ubisoft/Driver San Francisco"
           [[ -f "$doc/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$doc/Ubisoft/Driver San Francisco/offline.ini"
+          if [[ ! -f "$doc/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+            printf '%s' "$graphicsCfg" > "$doc/Ubisoft/Driver San Francisco/graphics.ini"
+          fi
         fi
       done
     fi

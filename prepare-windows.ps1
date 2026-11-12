@@ -20,6 +20,11 @@ $offlineIni = Join-Path $save 'offline.ini'
 if (!(Test-Path -LiteralPath $offlineIni)) {
     [IO.File]::WriteAllText($offlineIni, "OnlineUserName Player`r`nOnlineID 1`r`n")
 }
+$graphicsIni = Join-Path $save 'graphics.ini'
+$graphicsContent = "Fullscreen = 1`r`nVSync = 1`r`nPreciseVSync = 0`r`nWidth = 1920`r`nHeight = 1080`r`nRenderQuality = 2`r`nAntiAliasing = 2`r`nRadialBlur = 1`r`n"
+if (!(Test-Path -LiteralPath $graphicsIni) -or (Get-Content -LiteralPath $graphicsIni | Select-String 'RenderQuality = 0')) {
+    [IO.File]::WriteAllText($graphicsIni, $graphicsContent)
+}
 if ($backupMode -eq '1') {
 $backup = Join-Path $mod ('backups\windows-' + (Get-Date -Format 'yyyyMMdd-HHmmss-ffff'))
 New-Item -ItemType Directory -Path $backup | Out-Null

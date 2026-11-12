@@ -16,6 +16,7 @@ static char pendingSpawnModel[64]="";
 static std::atomic<int> pendingSpawnModelID{0};
 static std::atomic<bool> spawnRequested{false};
 static std::atomic<bool> unlockGarageRequested{false};
+static std::atomic<bool> completeGame100Requested{false};
 static char pendingMissionName[64]="";
 static char lastLaunchedMission[64]="";
 static std::atomic<bool> launchMissionRequested{false};
@@ -51,6 +52,11 @@ static void queueUnlockGarage() {
     unlockGarageRequested.store(true);
     streetRequest();
     logLine("Garage unlock requested");
+}
+static void queueCompleteGame100() {
+    completeGame100Requested.store(true);
+    streetRequest();
+    logLine("Complete game 100% requested");
 }
 static void stopStreets(){traffic=policeOff=false;NativeTraffic::set(false);streetRequest();}
 static bool streetsNeeded(){return !streetFailed && (traffic || policeOff || passengers || NativePassengers::active || NativeSignals::enabled || NativeSignals::active || streetCommand.load()!=streetCompleted.load());}
@@ -120,10 +126,10 @@ static void stopLive(){live=false;if((command.load()&7u)!=0)request(0);}
 static void chooseWeather(int preset){if(preset>=0 && preset<=5){live=preset!=0;request(preset);}}
 static void disable(){
     freeze=false;passengers=false;NativeSignals::enabled=false;NativeSignals::cancel();stopLive();stopStreets();
-    unlockGarageRequested=false;spawnRequested=false;pendingSpawnModelID=0;pendingSpawnModel[0]=0;
+    unlockGarageRequested=false;completeGame100Requested=false;spawnRequested=false;pendingSpawnModelID=0;pendingSpawnModel[0]=0;
     launchMissionRequested=false;teleportOnlyRequested=false;pendingMissionName[0]=0;
 }
-static bool needed(){return !failed && (freeze || live || installed || streetsNeeded() || command.load()!=completed.load() || unlockGarageRequested.load() || spawnRequested.load() || launchMissionRequested.load());}
+static bool needed(){return !failed && (freeze || live || installed || streetsNeeded() || command.load()!=completed.load() || unlockGarageRequested.load() || completeGame100Requested.load() || spawnRequested.load() || launchMissionRequested.load());}
 static int __cdecl frozen(State*L){api.pushBool(L,freeze && !failed);return 1;}
 static int __cdecl weather(State*L){
     api.pushBool(L,(syncToken&7u)!=0);
@@ -203,6 +209,188 @@ static void sync(State*L) {
             "  pcall(vehicleManager.updateVehicleUnlocks) "
             "end";
         if(api.loadBuffer(L,code,strlen(code),"@mod/unlock_garage.lua")==0)api.pcall(L,0,0,0);
+    }
+    if(completeGame100Requested.exchange(false)) {
+        const char *code =
+            "if ProfileSettings then "
+            "  if type(ProfileSettings.SetStoryModeComplete)=='function' then pcall(ProfileSettings.SetStoryModeComplete,true) end "
+            "  if type(ProfileSettings.SetChapter)=='function' then pcall(ProfileSettings.SetChapter,9) end "
+            "  if type(ProfileSettings.SetProgression)=='function' and type(challengeProgressionTable)=='table' then pcall(ProfileSettings.SetProgression,#challengeProgressionTable) end "
+            "  if type(ProfileSettings.SetWillpower)=='function' then pcall(ProfileSettings.SetWillpower,10000000) end "
+            "  if type(ProfileSettings.SetUserControlledShiftUnlocked)=='function' then pcall(ProfileSettings.SetUserControlledShiftUnlocked,true) end "
+            "  if type(ProfileSettings.SetTakedownUnlocked)=='function' then pcall(ProfileSettings.SetTakedownUnlocked,true) end "
+            "end "
+            "if type(progressionSystem)=='table' then "
+            "  progressionSystem.isEverythingUnlocked=true "
+            "  progressionSystem.currentChapter=8 "
+            "end "
+            "if type(challengeProgressionTable)=='table' and ProfileSettings then "
+            "  for _,pot in ipairs(challengeProgressionTable) do "
+            "    if type(pot)=='table' then "
+            "      for _,mList in pairs(pot) do "
+            "        if type(mList)=='table' then "
+            "          for _,ch in ipairs(mList) do "
+            "            if type(ch)=='table' and ch.ID then "
+            "              local netID=(cards and type(cards.ReverseMissionNetworkLookup)=='table' and cards.ReverseMissionNetworkLookup[ch.ID]) or ch.ID "
+            "              if netID then "
+            "                if type(ProfileSettings.SetMissionAttempted)=='function' then pcall(ProfileSettings.SetMissionAttempted,netID,true) end "
+            "                if type(ProfileSettings.SetMissionUnlocked)=='function' then pcall(ProfileSettings.SetMissionUnlocked,netID,true) end "
+            "                if type(ProfileSettings.SetMissionCompleted)=='function' then pcall(ProfileSettings.SetMissionCompleted,netID,true) end "
+            "                if type(ProfileSettings.SetMissionOwned)=='function' then pcall(ProfileSettings.SetMissionOwned,netID,true) end "
+            "              end "
+            "              ch.complete=true "
+            "            end "
+            "          end "
+            "        end "
+            "      end "
+            "    end "
+            "  end "
+            "end "
+            "if type(cards)=='table' and ProfileSettings then "
+            "  if type(cards.MissionNetworkLookup)=='table' then "
+            "    for netID,_ in pairs(cards.MissionNetworkLookup) do "
+            "      if type(ProfileSettings.SetMissionAttempted)=='function' then pcall(ProfileSettings.SetMissionAttempted,netID,true) end "
+            "      if type(ProfileSettings.SetMissionUnlocked)=='function' then pcall(ProfileSettings.SetMissionUnlocked,netID,true) end "
+            "      if type(ProfileSettings.SetMissionCompleted)=='function' then pcall(ProfileSettings.SetMissionCompleted,netID,true) end "
+            "      if type(ProfileSettings.SetMissionOwned)=='function' then pcall(ProfileSettings.SetMissionOwned,netID,true) end "
+            "    end "
+            "  end "
+            "  if type(cards.Missions)=='table' then "
+            "    for _,m in pairs(cards.Missions) do "
+            "      if type(m)=='table' and m.MissionID then "
+            "        if type(ProfileSettings.SetMissionAttempted)=='function' then pcall(ProfileSettings.SetMissionAttempted,m.MissionID,true) end "
+            "        if type(ProfileSettings.SetMissionUnlocked)=='function' then pcall(ProfileSettings.SetMissionUnlocked,m.MissionID,true) end "
+            "        if type(ProfileSettings.SetMissionCompleted)=='function' then pcall(ProfileSettings.SetMissionCompleted,m.MissionID,true) end "
+            "        if type(ProfileSettings.SetMissionOwned)=='function' then pcall(ProfileSettings.SetMissionOwned,m.MissionID,true) end "
+            "      end "
+            "    end "
+            "  end "
+            "end "
+            "if type(getChallengeList)=='function' and ProfileSettings then "
+            "  local ok,list=pcall(getChallengeList) "
+            "  if ok and type(list)=='table' then "
+            "    for _,group in pairs(list) do "
+            "      if type(group)=='table' then "
+            "        for _,ch in ipairs(group) do "
+            "          if type(ch)=='table' and ch.networkID then "
+            "            local isAct=(ch.type=='activity') "
+            "            local isMov=(ch.objectiveType=='Movie') "
+            "            if type(ProfileSettings.SetChallengeUnlocked)=='function' then pcall(ProfileSettings.SetChallengeUnlocked,ch.networkID,isAct,isMov) end "
+            "            if type(ProfileSettings.SetChallengeCompleted)=='function' then pcall(ProfileSettings.SetChallengeCompleted,ch.networkID,true) end "
+            "            if type(ProfileSettings.SetChallengeOwned)=='function' then pcall(ProfileSettings.SetChallengeOwned,ch.networkID,isAct,isMov) end "
+            "          end "
+            "        end "
+            "      end "
+            "    end "
+            "  end "
+            "end "
+            "if type(challengeLookupTable)=='table' and ProfileSettings then "
+            "  for groupName,group in pairs(challengeLookupTable) do "
+            "    if type(group)=='table' then "
+            "      for _,ch in ipairs(group) do "
+            "        local id=ch.networkID or (cards and type(cards.ReverseMissionNetworkLookup)=='table' and cards.ReverseMissionNetworkLookup[ch.ID or ch.name]) "
+            "        if id then "
+            "          if type(ProfileSettings.SetChallengeUnlocked)=='function' then pcall(ProfileSettings.SetChallengeUnlocked,id,groupName=='activity',groupName=='movie') end "
+            "          if type(ProfileSettings.SetChallengeCompleted)=='function' then pcall(ProfileSettings.SetChallengeCompleted,id,true) end "
+            "          if type(ProfileSettings.SetChallengeOwned)=='function' then pcall(ProfileSettings.SetChallengeOwned,id,true) end "
+            "        end "
+            "      end "
+            "    end "
+            "  end "
+            "end "
+            "if ProfileSettings then "
+            "  if type(daresByChapter)=='table' then "
+            "    for _,dList in pairs(daresByChapter) do "
+            "      if type(dList)=='table' then "
+            "        for _,dare in pairs(dList) do "
+            "          local uid=dare.uid or dare.ID "
+            "          if uid then "
+            "            if type(ProfileSettings.SetDareUnlocked)=='function' then pcall(ProfileSettings.SetDareUnlocked,uid,true) end "
+            "            if type(ProfileSettings.SetDareCompleted)=='function' then pcall(ProfileSettings.SetDareCompleted,uid,true) end "
+            "          end "
+            "        end "
+            "      end "
+            "    end "
+            "  end "
+            "  if type(daresByUID)=='table' then "
+            "    for uid,_ in pairs(daresByUID) do "
+            "      if type(ProfileSettings.SetDareUnlocked)=='function' then pcall(ProfileSettings.SetDareUnlocked,uid,true) end "
+            "      if type(ProfileSettings.SetDareCompleted)=='function' then pcall(ProfileSettings.SetDareCompleted,uid,true) end "
+            "    end "
+            "  end "
+            "  for id=1,120 do "
+            "    if type(ProfileSettings.SetDareUnlocked)=='function' then pcall(ProfileSettings.SetDareUnlocked,id,true) end "
+            "    if type(ProfileSettings.SetDareCompleted)=='function' then pcall(ProfileSettings.SetDareCompleted,id,true) end "
+            "  end "
+            "end "
+            "if ProfileSettings then "
+            "  if type(collectablesByUID)=='table' then "
+            "    for uid,token in pairs(collectablesByUID) do "
+            "      if type(ProfileSettings.SetCollectableUnlocked)=='function' then pcall(ProfileSettings.SetCollectableUnlocked,uid,true) end "
+            "      if type(ProfileSettings.SetCollectableOwned)=='function' then pcall(ProfileSettings.SetCollectableOwned,uid,true) end "
+            "      if type(token)=='table' then token.collected=true; token.initialiseCollected=true end "
+            "    end "
+            "  end "
+            "  if type(collectables)=='table' and type(collectables.collectableLookupTable)=='table' then "
+            "    for id,_ in pairs(collectables.collectableLookupTable) do "
+            "      if type(ProfileSettings.SetCollectableUnlocked)=='function' then pcall(ProfileSettings.SetCollectableUnlocked,id,true) end "
+            "      if type(ProfileSettings.SetCollectableOwned)=='function' then pcall(ProfileSettings.SetCollectableOwned,id,true) end "
+            "    end "
+            "  end "
+            "  for id=1,250 do "
+            "    if type(ProfileSettings.SetCollectableUnlocked)=='function' then pcall(ProfileSettings.SetCollectableUnlocked,id,true) end "
+            "    if type(ProfileSettings.SetCollectableOwned)=='function' then pcall(ProfileSettings.SetCollectableOwned,id,true) end "
+            "  end "
+            "  if type(incrementTokensCollected)=='function' then "
+            "    local curTokens=(type(getTokensCollected)=='function' and getTokensCollected()) or 0 "
+            "    for i=curTokens+1,80 do pcall(incrementTokensCollected) end "
+            "  end "
+            "  if type(collectables)=='table' and type(collectables.updateCollectableUnlocks)=='function' then pcall(collectables.updateCollectableUnlocks) end "
+            "end "
+            "if ProfileSettings then "
+            "  if type(garage)=='table' and type(garage.locations)=='table' then "
+            "    for _,g in pairs(garage.locations) do "
+            "      if type(g)=='table' and g.ID then "
+            "        if type(ProfileSettings.SetGarageUnlocked)=='function' then pcall(ProfileSettings.SetGarageUnlocked,g.ID,true) end "
+            "        if type(ProfileSettings.SetGarageOwned)=='function' then pcall(ProfileSettings.SetGarageOwned,g.ID,true) end "
+            "        if type(ProfileSettings.SetGarageBought)=='function' then pcall(ProfileSettings.SetGarageBought,g.ID,true) end "
+            "      end "
+            "    end "
+            "  end "
+            "  for id=1,30 do "
+            "    if type(ProfileSettings.SetGarageUnlocked)=='function' then pcall(ProfileSettings.SetGarageUnlocked,id,true) end "
+            "    if type(ProfileSettings.SetGarageOwned)=='function' then pcall(ProfileSettings.SetGarageOwned,id,true) end "
+            "    if type(ProfileSettings.SetGarageBought)=='function' then pcall(ProfileSettings.SetGarageBought,id,true) end "
+            "  end "
+            "  if type(ProfileSettings.SetGarageTutorialPlayed)=='function' then pcall(ProfileSettings.SetGarageTutorialPlayed,true) end "
+            "  if type(ProfileSettings.SetGarageWillpowerTutorialPlayed)=='function' then pcall(ProfileSettings.SetGarageWillpowerTutorialPlayed,true) end "
+            "  if type(garage)=='table' and type(garage.updateGarageUnlocks)=='function' then pcall(garage.updateGarageUnlocks) end "
+            "end "
+            "for id=1,160 do "
+            "  if ProfileSettings and type(ProfileSettings.SetVehicleUnlocked)=='function' then pcall(ProfileSettings.SetVehicleUnlocked,id,true) end "
+            "  if ProfileSettings and type(ProfileSettings.SetVehicleOwned)=='function' then pcall(ProfileSettings.SetVehicleOwned,id,true) end "
+            "  if type(vehicleStats)=='table' and type(vehicleStats[id])=='table' then "
+            "    vehicleStats[id].UnlockedInGarage=true "
+            "    vehicleStats[id].garageUnlocked=true "
+            "  end "
+            "end "
+            "if type(vehicleManager)=='table' and type(vehicleManager.updateVehicleUnlocks)=='function' then pcall(vehicleManager.updateVehicleUnlocks) end "
+            "if ProfileSettings then "
+            "  for ability=0,9 do "
+            "    pcall(ProfileSettings.SetAbilityUnlocked,ability,0,true) "
+            "    pcall(ProfileSettings.SetAbilityOwned,ability,0,true) "
+            "    for level=1,2 do "
+            "      pcall(ProfileSettings.SetAbilityUnlocked,ability,level,true) "
+            "      pcall(ProfileSettings.SetAbilityOwned,ability,level,true) "
+            "    end "
+            "  end "
+            "end "
+            "if type(unlockAllAbilities)=='function' then pcall(unlockAllAbilities) end "
+            "if type(enableCityLocking)=='function' then pcall(enableCityLocking,false) end "
+            "if ProfileSettings and type(ProfileSettings.TriggerAutoSave)=='function' then pcall(ProfileSettings.TriggerAutoSave) end "
+            "if type(progressionSystem)=='table' and type(progressionSystem.saveGame)=='function' then pcall(progressionSystem.saveGame,'When you complete the game') end";
+        if(api.loadBuffer(L,code,strlen(code),"@mod/complete_game_100.lua")==0)api.pcall(L,0,0,0);
+        logLine("Game completed 100%: missions, dares, tokens, garages and cars applied and autosaved");
     }
     if(spawnRequested.exchange(false)) {
         int id=pendingSpawnModelID.exchange(0);

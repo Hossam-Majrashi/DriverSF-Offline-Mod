@@ -325,6 +325,7 @@ static void drawMenu(IDirect3DDevice9 *device) {
     if(!uiReady) {
         D3DDEVICE_CREATION_PARAMETERS cp{};device->GetCreationParameters(&cp);windowHandle=cp.hFocusWindow;
         ImGui::CreateContext();auto &io=ImGui::GetIO();io.IniFilename=nullptr;io.LogFilename=nullptr;
+        onCompleteGame100 = VehicleMod::NitroLua::World::queueCompleteGame100;
         loadSettings();Ui::initFont();
         io.ConfigFlags|=ImGuiConfigFlags_NavEnableKeyboard;io.FontGlobalScale=menuScalePercent/100.0f;
         ImGui::StyleColorsDark();ImGui_ImplWin32_Init(windowHandle);ImGui_ImplDX9_Init(device);

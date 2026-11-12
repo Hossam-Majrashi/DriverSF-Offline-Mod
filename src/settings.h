@@ -4,6 +4,7 @@ static const WCHAR*signalPadNames[]={L"LeftPad",L"RightPad",L"HazardPad"};
 static WCHAR settingsPath[MAX_PATH];
 static int menuScalePercent=125;
 static char settingsStatus[160]="Preferences loaded.";
+static void (*onCompleteGame100)() = nullptr;
 static int clampSetting(int value,int low,int high,int fallback) {
     return value>=low && value<=high?value:fallback;
 }
@@ -47,6 +48,13 @@ static void drawSettings() {
     Ui::TextUnformatted("Developer: Hossam Majrashi");
     Ui::TextWrapped("GitHub: https://github.com/Hossam-Majrashi");
     if(Ui::Button("Copy GitHub URL"))ImGui::SetClipboardText("https://github.com/Hossam-Majrashi");
+    ImGui::Separator();
+    Ui::TextUnformatted("Game Completion [100%]");
+    if(Ui::Button("Complete Game [100%]: All Missions, Dares & Tokens")) {
+        if(onCompleteGame100) onCompleteGame100();
+        strcpy(settingsStatus,"[100%] All missions, dares, tokens & cars unlocked and saved.");
+    }
+    Ui::TextDisabled("Unlocks all main story missions, challenges, city movie tokens, garages and cars.");
     ImGui::Separator();
     Ui::TextUnformatted("Language / English");
     ImGui::PushID("ui-language");

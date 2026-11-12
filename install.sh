@@ -69,8 +69,12 @@ if [[ "$(uname -s)" == "Linux" ]]; then
     printf 'Compatibility prefix ready: %s\n' "$prefix"
   fi
   offlineCfg='OnlineUserName Player'$'\n''OnlineID 1'$'\n'
+  graphicsCfg='Fullscreen = 1'$'\n''VSync = 1'$'\n''PreciseVSync = 0'$'\n''Width = 1920'$'\n''Height = 1080'$'\n''RenderQuality = 2'$'\n''AntiAliasing = 2'$'\n''RadialBlur = 1'$'\n'
   mkdir -p "$HOME/Documents/Ubisoft/Driver San Francisco"
   [[ -f "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini"
+  if [[ ! -f "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+    printf '%s' "$graphicsCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini"
+  fi
   if [[ -d "$prefix/drive_c/users" ]]; then
     for u in "$prefix/drive_c/users/"*; do
       if [[ -d "$u" ]]; then
@@ -78,6 +82,9 @@ if [[ "$(uname -s)" == "Linux" ]]; then
           if [[ -d "$doc" ]]; then
             mkdir -p "$doc/Ubisoft/Driver San Francisco"
             [[ -f "$doc/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$doc/Ubisoft/Driver San Francisco/offline.ini"
+            if [[ ! -f "$doc/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+              printf '%s' "$graphicsCfg" > "$doc/Ubisoft/Driver San Francisco/graphics.ini"
+            fi
           fi
         done
       fi
