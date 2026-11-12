@@ -13,11 +13,16 @@ if (!(Test-Path -LiteralPath $source)) { throw 'Missing mod/build/dinput8.dll' }
 if (Test-Path -LiteralPath $target) {
     if ((Get-FileHash -LiteralPath $source).Hash -ne (Get-FileHash -LiteralPath $target).Hash) { throw 'dinput8.dll conflict: not overwriting.' }
 } else { Copy-Item -LiteralPath $source -Destination $target }
+$docs = [Environment]::GetFolderPath('MyDocuments')
+$save = Join-Path $docs 'Ubisoft\Driver San Francisco'
+if (!(Test-Path -LiteralPath $save)) { New-Item -ItemType Directory -Force -Path $save | Out-Null }
+$offlineIni = Join-Path $save 'offline.ini'
+if (!(Test-Path -LiteralPath $offlineIni)) {
+    [IO.File]::WriteAllText($offlineIni, "OnlineUserName Player`r`nOnlineID 1`r`n")
+}
 if ($backupMode -eq '1') {
 $backup = Join-Path $mod ('backups\windows-' + (Get-Date -Format 'yyyyMMdd-HHmmss-ffff'))
 New-Item -ItemType Directory -Path $backup | Out-Null
-$docs = [Environment]::GetFolderPath('MyDocuments')
-$save = Join-Path $docs 'Ubisoft\Driver San Francisco'
 if (Test-Path -LiteralPath $save) { Copy-Item -LiteralPath $save -Destination (Join-Path $backup 'Driver San Francisco') -Recurse }
 # Preserve Ubisoft's launcher saves as well where present, without changing them.
 foreach ($pf in @(${env:ProgramFiles(x86)}, $env:ProgramFiles)) {

@@ -34,6 +34,22 @@ if [[ ! -f "$WINEPREFIX/system.reg" || ! -d "$WINEPREFIX/drive_c" ]]; then
 fi
 [[ -f "$WINEPREFIX/system.reg" && -d "$WINEPREFIX/drive_c" ]] || { echo "Missing existing prefix: $WINEPREFIX" >&2; exit 1; }
 [[ -f "$umu" ]] || { echo "Missing UMU runtime: $umu (set DSF_UMU)." >&2; exit 1; }
+# Ensure offline profile configuration exists so the game never prompts for online login
+offlineCfg='OnlineUserName Player'$'\n''OnlineID 1'$'\n'
+mkdir -p "$HOME/Documents/Ubisoft/Driver San Francisco"
+[[ -f "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini"
+if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
+  for u in "$WINEPREFIX/drive_c/users/"*; do
+    if [[ -d "$u" ]]; then
+      for doc in "$u/Documents" "$u/My Documents"; do
+        if [[ -d "$doc" ]]; then
+          mkdir -p "$doc/Ubisoft/Driver San Francisco"
+          [[ -f "$doc/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$doc/Ubisoft/Driver San Francisco/offline.ini"
+        fi
+      done
+    fi
+  done
+fi
 # Prefer mapped SDL/XInput for this DS4 only; no global remap/registry changes.
 ds4Mode="${DSF_DS4_XINPUT:-1}"
 case "$ds4Mode" in 0|1) ;; *) echo 'DSF_DS4_XINPUT must be 0 or 1.' >&2; exit 1 ;; esac

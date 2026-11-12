@@ -500,6 +500,14 @@ BOOL WINAPI DllMain(HINSTANCE module,DWORD reason,LPVOID) {
         // The proxy is loaded as a normal game import. No remote injection.
         logHandle=CreateFileA("mod\\logs\\mod-runtime.log",FILE_APPEND_DATA,FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_ALWAYS,0,nullptr);
         logLine("Offline mod v7.14 attached; selected 100/200/300/400/500 MPH targets; supported mission countdown / native weather controls; Arabic-default/English UI; player passenger removal default ON, other gameplay switches OFF; gameplay acceptance pending");
+        if(inside(image+0x46383b,2) && image[0x46383b]==0x75 && image[0x46383c]==0x16) {
+            DWORD oldProtect=0;
+            if(VirtualProtect(image+0x46383b,2,PAGE_EXECUTE_READWRITE,&oldProtect)) {
+                image[0x46383b]=0xeb;
+                VirtualProtect(image+0x46383b,2,oldProtect,&oldProtect);
+                logLine("Offline login check bypassed (RVA 0x46383b forced jmp)");
+            }
+        }
         replaceImport("USER32.dll","GetAsyncKeyState",(void*)quietAsync);
         replaceImport("USER32.dll","GetKeyState",(void*)quietKey);
         replaceImport("USER32.dll","GetKeyboardState",(void*)quietKeyboard);

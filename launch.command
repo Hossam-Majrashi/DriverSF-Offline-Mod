@@ -29,6 +29,21 @@ else
   cp -n "$here/build/dinput8.dll" "$game/dinput8.dll"
 fi
 if [[ "$backupMode" == 1 ]]; then python3 "$here/tools/backup_saves.py" "$prefix"; fi
+offlineCfg='OnlineUserName Player'$'\n''OnlineID 1'$'\n'
+mkdir -p "$HOME/Documents/Ubisoft/Driver San Francisco"
+[[ -f "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini"
+if [[ -d "$prefix/drive_c/users" ]]; then
+  for u in "$prefix/drive_c/users/"*; do
+    if [[ -d "$u" ]]; then
+      for doc in "$u/Documents" "$u/My Documents"; do
+        if [[ -d "$doc" ]]; then
+          mkdir -p "$doc/Ubisoft/Driver San Francisco"
+          [[ -f "$doc/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$doc/Ubisoft/Driver San Francisco/offline.ini"
+        fi
+      done
+    fi
+  done
+fi
 export WINEPREFIX="$prefix"
 export WINEDLLOVERRIDES="${WINEDLLOVERRIDES:+$WINEDLLOVERRIDES;}dinput8=n,b"
 cd -- "$game"
