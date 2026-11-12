@@ -294,6 +294,17 @@ static void draw() {
         Ui::TextWrapped("RAM: hold Alt, then release.");
         if(Ui::Button("Restore boost defaults")){nitro=false;ram=false;logLine("boost/RAM defaults restored");}
     }
+    if(Ui::CollapsingHeader("Game Completion [100%]",ImGuiTreeNodeFlags_DefaultOpen)) {
+        static bool complete100Notified=false;
+        if(Ui::Button("Complete Game [100%]: All Missions, Dares & Tokens",ImVec2(-1,0))) {
+            NitroLua::World::queueCompleteGame100();
+            complete100Notified=true;
+        }
+        if(complete100Notified) {
+            Ui::Text("[100%] All missions, dares, tokens & cars unlocked and saved.");
+        }
+        Ui::TextDisabled("Unlocks all main story missions, challenges, city movie tokens, garages and cars.");
+    }
     if(Ui::CollapsingHeader("Mission & special vehicles",ImGuiTreeNodeFlags_DefaultOpen)) {
         if(Ui::Button("Unlock all vehicles & mission cars in garage",ImVec2(-1,0))) {
             NitroLua::World::queueUnlockGarage();
