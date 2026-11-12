@@ -249,7 +249,14 @@ static void observe() {
             lastObservedCar=uintptr_t(v);
             if(health.load() || body.load())requestRepair();
             if(nitro.load())refillNitro();
-            if(NitroLua::World::traffic.load())NitroLua::World::streetRequest();
+            if(NitroLua::World::density.load()==0) {
+                NitroLua::World::traffic=true;
+                NitroLua::World::policeOff=true;
+                NitroLua::World::trafficUnavailable=false;
+                NitroLua::World::streetRequest();
+            } else if(NitroLua::World::traffic.load()) {
+                NitroLua::World::streetRequest();
+            }
         }
     } else {
         lastObservedCar=0;

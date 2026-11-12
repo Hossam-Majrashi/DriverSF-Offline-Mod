@@ -3,7 +3,7 @@
   "developer": "Hossam Majrashi",
   "github": "https://github.com/Hossam-Majrashi",
   "dll": "build/dinput8.dll",
-  "dll_sha256": "0c909d52c0c08984b3dd674262b3e4f5aef3b73ed2ef79c7d175c478c28a88e9",
+  "dll_sha256": "f2842c38fc176c989a6b042feb18339211dcf79209d1ea5f691bb1205bbd693f",
   "world_review_revision": "review10: bind Paranoia/TheSneakout live slot-2 120s HUD params to owned 123s failure deadline; verify running native timer callbacks and shared/captured upvalue cleanup; native HUD resets/foreign writes take precedence; hold actual suspicion payload deltas via verified per-task callback, retaining goal progression and avoiding repaint/replay; bound diagnostic writes; legacy timer and review9 street/audio/signals logic retained; gameplay acceptance pending",
   "traffic_zero_includes_ambient_police": true,
   "traffic_zero_police_gameplay_verified": false,

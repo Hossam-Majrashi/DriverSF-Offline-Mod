@@ -57,7 +57,12 @@ static void restoreZero(){
 static bool canZero(){
     if(!ready || !zeroReady || (zero.blocked && zero.canceled==epoch()))return false;
     BYTE*m=expectedManager();
-    return m && m[0x5ca84c]<=1 && !(zero.manager==m && zero.owned && m[0x5ca84c]!=0);
+    if(!m || m[0x5ca84c]>1)return false;
+    if(zero.manager==m && zero.owned && m[0x5ca84c]!=0){
+        if(zero.canceled!=epoch())zero.owned=false;
+        else return false;
+    }
+    return true;
 }
 static bool set(bool enabled,int percent=100) {
     if(!enabled){permit=false;restoreZero();return ready;}
@@ -70,7 +75,8 @@ static bool set(bool enabled,int percent=100) {
     if(percent!=0){restoreZero();return true;}
     BYTE*m=expectedManager();if(!m || m[0x5ca84c]>1){permit=false;restoreZero();return false;}
     if(zero.manager==m && zero.owned && m[0x5ca84c]!=0){
-        zero.owned=false;zero.blocked=true;zero.canceled=epoch();permit=false;return false;
+        if(zero.canceled!=epoch())zero.owned=false;
+        else {zero.owned=false;zero.blocked=true;zero.canceled=epoch();permit=false;return false;}
     }
     if(zero.manager!=m || !zero.owned){restoreZero();zero.manager=m;zero.before=m[0x5ca84c]!=0;zero.owned=true;
         originalOnOff(m,false);

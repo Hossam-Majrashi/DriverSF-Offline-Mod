@@ -7,11 +7,13 @@
 حزمة النشر `Driver.exe` أو أرشيفات اللعبة أو أصواتها أو صورها أو ملفات الحفظ.
 لا يقدم المود تجاوزًا للتفعيل أو متطلبات امتلاك اللعبة.
 
-## فيديو المود / Gameplay Video
+## استعراض المود / Mod Showcase
 
-[![مشاهدة فيديو المود / Watch gameplay video](assets/videos/video-preview.jpg)](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/raw/refs/heads/main/assets/videos/video.mp4)
+<p align="center">
+  <img src="assets/videos/gameplay.gif" alt="Driver San Francisco Mod Showcase" width="100%">
+</p>
 
-[▶ مشاهدة الفيديو / Watch video](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/raw/refs/heads/main/assets/videos/video.mp4)
+[⬇ تنزيل الفيديو الكامل بجودة عالية (MP4) / Download Full Video](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/raw/refs/heads/main/assets/videos/video.mp4)
 
 ## لقطات من اللعبة / Gameplay Screenshots
 

@@ -72,9 +72,16 @@ static int __cdecl diagnostic(State*L) {
 static int __cdecl nativeTraffic(State*L) {
     bool allow=api.getTop(L)>=1 && api.type(L,1)==1 && api.toBool(L,1) && traffic && !streetFailed && !failed;
     bool probe=api.getTop(L)>=2 && api.type(L,2)==1 && api.toBool(L,2);
-    if(probe){api.pushBool(L,allow && density==0 && NativeTraffic::canZero());return 1;}
+    if(probe){
+        if(allow && density==0 && !NativeTraffic::canZero() && traffic)streetRequest();
+        api.pushBool(L,allow && density==0 && NativeTraffic::canZero());return 1;
+    }
     bool accepted=NativeTraffic::set(allow,density.load());
-    if(allow && !accepted && NativeTraffic::ready && density==0)traffic=false;
+    if(allow && !accepted && NativeTraffic::ready && density==0){
+        streetRequest();
+        accepted=NativeTraffic::set(allow,density.load());
+        if(!accepted)traffic=false;
+    }
     api.pushBool(L,accepted);return 1;
 }
 static int __cdecl passengerAccess(State*L) {
@@ -628,7 +635,12 @@ static void draw() {
     bool block=policeOff;
     if(Ui::Checkbox("Disable free-drive police",&block)){policeOff=block;streetRequest();}
     bool use=traffic;
-    if(Ui::Checkbox("Control traffic level",&use)){traffic=use;if(use)trafficUnavailable=false;streetRequest();}
+    if(Ui::Checkbox("Control traffic level",&use)){
+        traffic=use;
+        if(use)trafficUnavailable=false;
+        else if(density==0)density=100;
+        streetRequest();
+    }
     int percent=density;
     if(Ui::SliderInt("Traffic level (0-100)",&percent,0,100)){density=percent<0?0:percent>100?100:percent;if(traffic)streetRequest();}
     if(Ui::Button("No Traffic (0)")) {density=0;traffic=true;policeOff=true;trafficUnavailable=false;streetRequest();}
