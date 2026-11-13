@@ -3,6 +3,8 @@
 مود قائمة محلية للعب دون اتصال، من تطوير **Hossam Majrashi**.
 [GitHub](https://github.com/Hossam-Majrashi)
 
+[⬇ **تحميل ملف المود المباشر (dinput8.dll)**](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/releases/download/v7.14/dinput8.dll) • [📦 **تحميل حزمة المود الكاملة (ZIP)**](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/releases/download/v7.14/DriverSF-Offline-Mod-v7.14.zip) • [🚀 **صفحة الإصدارات (Releases)**](https://github.com/Hossam-Majrashi/DriverSF-Offline-Mod/releases/tag/v7.14)
+
 **هذا المشروع يوزع المود، وليس اللعبة.** يلزم امتلاك نسخة مثبتة أصلية. لا تتضمن
 حزمة النشر `Driver.exe` أو أرشيفات اللعبة أو أصواتها أو صورها أو ملفات الحفظ.
 لا يقدم المود تجاوزًا للتفعيل أو متطلبات امتلاك اللعبة.
