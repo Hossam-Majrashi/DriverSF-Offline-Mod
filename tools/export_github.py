@@ -17,7 +17,7 @@ ROOT_FILES = (
     '.gitignore', '.gitattributes', 'README.md', 'PUBLISHING_AR.md',
     'THIRD_PARTY_NOTICES.md', 'release.json', 'settings.example.ini',
     'build.sh', 'install.sh', 'launch.sh', 'launch.cmd', 'launch.command',
-    'prepare-windows.ps1', 'build/dinput8.dll', 'build/SHA256SUMS',
+    'prepare-windows.ps1', 'dxvk.conf', 'build/dinput8.dll', 'build/SHA256SUMS',
 )
 FILTER_FILES = (
     'asset_filter/manage.py', 'asset_filter/video_filter.py',

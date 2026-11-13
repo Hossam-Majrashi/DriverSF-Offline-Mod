@@ -36,10 +36,10 @@ fi
 [[ -f "$umu" ]] || { echo "Missing UMU runtime: $umu (set DSF_UMU)." >&2; exit 1; }
 # Ensure offline profile and optimal graphics settings exist so the game never prompts for online login or resets to low quality
 offlineCfg='OnlineUserName Player'$'\n''OnlineID 1'$'\n'
-graphicsCfg='Fullscreen = 1'$'\n''VSync = 1'$'\n''PreciseVSync = 0'$'\n''Width = 1920'$'\n''Height = 1080'$'\n''RenderQuality = 2'$'\n''AntiAliasing = 2'$'\n''RadialBlur = 1'$'\n'
+graphicsCfg='Fullscreen = 1'$'\n''VSync = 0'$'\n''PreciseVSync = 0'$'\n''Width = 1920'$'\n''Height = 1080'$'\n''RenderQuality = 2'$'\n''AntiAliasing = 2'$'\n''RadialBlur = 1'$'\n'
 mkdir -p "$HOME/Documents/Ubisoft/Driver San Francisco"
 [[ -f "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/offline.ini"
-if [[ ! -f "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+if [[ ! -f "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null || grep -q 'VSync = 1' "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
   printf '%s' "$graphicsCfg" > "$HOME/Documents/Ubisoft/Driver San Francisco/graphics.ini"
 fi
 if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
@@ -49,7 +49,7 @@ if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
         if [[ -d "$doc" ]]; then
           mkdir -p "$doc/Ubisoft/Driver San Francisco"
           [[ -f "$doc/Ubisoft/Driver San Francisco/offline.ini" ]] || printf '%s' "$offlineCfg" > "$doc/Ubisoft/Driver San Francisco/offline.ini"
-          if [[ ! -f "$doc/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
+          if [[ ! -f "$doc/Ubisoft/Driver San Francisco/graphics.ini" ]] || grep -q 'RenderQuality = 0' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null || grep -q 'VSync = 1' "$doc/Ubisoft/Driver San Francisco/graphics.ini" 2>/dev/null; then
             printf '%s' "$graphicsCfg" > "$doc/Ubisoft/Driver San Francisco/graphics.ini"
           fi
         fi
@@ -57,6 +57,7 @@ if [[ -d "$WINEPREFIX/drive_c/users" ]]; then
     fi
   done
 fi
+[[ ! -f "$here/dxvk.conf" || -f "$game/dxvk.conf" ]] || cp -p -- "$here/dxvk.conf" "$game/dxvk.conf"
 # Prefer mapped SDL/XInput for this DS4 only; no global remap/registry changes.
 ds4Mode="${DSF_DS4_XINPUT:-1}"
 case "$ds4Mode" in 0|1) ;; *) echo 'DSF_DS4_XINPUT must be 0 or 1.' >&2; exit 1 ;; esac
@@ -83,6 +84,18 @@ if [[ "$mode" == mod ]]; then "$here/install.sh"; override='dinput8=n,b'; else o
 if [[ "$backupMode" == 1 ]]; then python3 "$here/tools/backup_saves.py" "$WINEPREFIX"; fi
 export WINEDLLOVERRIDES="${WINEDLLOVERRIDES:+$WINEDLLOVERRIDES;}$override"
 export GAMEID=umu-default STORE=ubisoft UMU_RUNTIME_UPDATE=0
+if [[ -e /dev/nvidia0 ]] || command -v nvidia-smi >/dev/null 2>&1; then
+  export __NV_PRIME_RENDER_OFFLOAD=1
+  export __VK_LAYER_NV_optimus=NVIDIA_only
+  export __GLX_VENDOR_LIBRARY_NAME=nvidia
+  if command -v nvidia-settings >/dev/null 2>&1; then
+    nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=1" >/dev/null 2>&1 || true
+  fi
+fi
+export DXVK_ASYNC=1
+export DXVK_STATE_CACHE=1
+export DXVK_CONFIG_FILE="$game/dxvk.conf"
+export WINEDEBUG="-all"
 cd -- "$game"
 mkdir -p "$here/logs"
 log="$here/logs/launch-$(date +%Y%m%d-%H%M%S).log"
