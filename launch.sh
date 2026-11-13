@@ -95,6 +95,7 @@ fi
 export DXVK_ASYNC=1
 export DXVK_STATE_CACHE=1
 export DXVK_CONFIG_FILE="$game/dxvk.conf"
+export PROTON_FORCE_LARGE_ADDRESS_AWARE=1
 export WINEDEBUG="-all"
 cd -- "$game"
 mkdir -p "$here/logs"

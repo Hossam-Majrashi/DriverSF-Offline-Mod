@@ -197,7 +197,11 @@ static void sync(State*L) {
                 } else if(traffic || policeOff || streetError) {
                     stopStreets();
                 } else streetCompleted=streetToken;
-                logLine("Street controls canceled: mission/native context, unavailable API or ownership change");
+                static uint32_t lastReportedCanceledToken = 0;
+                if(lastReportedCanceledToken != streetToken) {
+                    lastReportedCanceledToken = streetToken;
+                    logLine("Street controls canceled: mission/native context, unavailable API or ownership change");
+                }
             }
             if(handled){completed=syncToken;char b[180];snprintf(b,sizeof(b),"World weather request acknowledged: token=%u preset=%u; native mood/sky request, NOT visual acceptance",unsigned(syncToken),unsigned(syncToken&7));logLine(b);}
             if(canceled && command.load()==syncToken){stopLive();logLine("World weather canceled: mission/native mood changed or preset unavailable; native mission wins");}
