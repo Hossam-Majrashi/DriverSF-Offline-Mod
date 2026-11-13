@@ -258,12 +258,6 @@ static void observe() {
                 NitroLua::World::streetRequest();
             }
         }
-        if(NitroLua::World::density.load()==0 && !NitroLua::World::traffic.load()) {
-            NitroLua::World::traffic=true;
-            NitroLua::World::policeOff=true;
-            NitroLua::World::trafficUnavailable=false;
-            NitroLua::World::streetRequest();
-        }
     } else {
         lastObservedCar=0;
     }

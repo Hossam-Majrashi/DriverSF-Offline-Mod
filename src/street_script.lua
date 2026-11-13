@@ -247,7 +247,7 @@ return function(safe)
     if type(occupants)=='function' then passengerApi=occupants end
     if type(lamps)=='function' then signalApi=lamps end
     local free=safe and freeDrive()
-    if not lastFree and free then lastCheck=nil end
+    if lastFree==false and free then lastCheck=0 end
     lastFree=free
     -- Default passenger policy is armed across missions/VM changes, but can
     -- touch ONLY the live player car in free drive. Independent of traffic/police.
