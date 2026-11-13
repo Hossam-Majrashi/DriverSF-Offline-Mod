@@ -5,9 +5,9 @@ static std::atomic<bool> bound{false},freeze{false},live{false},installed{false}
 static std::atomic<uint32_t> command{0},completed{0};
 static std::atomic<DWORD> deadline{0};
 static std::atomic<unsigned long> syncs{0},errors{0};
-static std::atomic<bool> traffic{false},policeOff{false},passengers{true},streetFailed{false};
+static std::atomic<bool> traffic{true},policeOff{true},passengers{true},streetFailed{false};
 static std::atomic<bool> trafficUnavailable{false};
-static std::atomic<int> density{100};
+static std::atomic<int> density{0};
 static std::atomic<uint32_t> streetCommand{0},streetCompleted{0};
 static std::atomic<DWORD> streetDeadline{0};
 static std::atomic<unsigned> streetErrors{0};
@@ -192,8 +192,11 @@ static void sync(State*L) {
             }
             if(streetCanceled && streetCommand.load()==streetToken && !streetFailed) {
                 // Do not endlessly manufacture cleanup commands when already OFF.
-                if(traffic || policeOff || streetError)stopStreets();
-                else streetCompleted=streetToken;
+                if(density.load()==0 && traffic && !streetError) {
+                    streetCompleted=streetToken;
+                } else if(traffic || policeOff || streetError) {
+                    stopStreets();
+                } else streetCompleted=streetToken;
                 logLine("Street controls canceled: mission/native context, unavailable API or ownership change");
             }
             if(handled){completed=syncToken;char b[180];snprintf(b,sizeof(b),"World weather request acknowledged: token=%u preset=%u; native mood/sky request, NOT visual acceptance",unsigned(syncToken),unsigned(syncToken&7));logLine(b);}
